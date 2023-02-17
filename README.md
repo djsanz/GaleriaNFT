@@ -1,4 +1,7 @@
 # galerianft
+Plantilla Vue3 con TailWind
+
+
 
 ## Project setup
 ```
