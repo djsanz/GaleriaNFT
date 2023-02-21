@@ -1,49 +1,64 @@
 <template>
 	<div class="flex flex-col align-middle items-center justify-center text-center p-2">
-		<div class="flex w-full">
-			<!-- <div class="flex">
-				Supported Chains:
-			</div> -->
-			<div class="flex flex-1 justify-center items-center align-middle h-16">
-				<div class="mx-2" :class="this.formulario.chain == 'Hedera'?'border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
-					<img src="@/assets/images/Hedera.png" class="inline h-10 rounded-xl bg-slate-400 p-2" />
+		<form @submit.prevent="submit">
+			<div class="flex w-full">
+					<div class="flex flex-1 justify-center items-center align-middle h-12 sm:h-16">
+						<div class="mx-2" :class="this.formulario.chain == 'Hedera'?'border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
+							<img
+								src="@/assets/images/Hedera.png" class="inline h-8 sm:h-10 rounded-xl bg-slate-400 p-2"
+								:class="this.formulario.chain != 'Hedera' && this.formulario.chain != ''?'blur-sm':''" />
+						</div>
+						<div class="mx-2" :class="this.formulario.chain == 'Solana'?'border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
+							<img
+								src="@/assets/images/Solana.png" class="inline h-8 sm:h-10 rounded-xl bg-slate-400 p-2"
+								:class="this.formulario.chain != 'Solana' && this.formulario.chain != ''?'blur-sm':''" />
+						</div>
+						<div class="mx-2" :class="this.formulario.chain == 'Ethereum'?' border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
+							<img
+								src="@/assets/images/Ethereum.png" class="inline h-8 sm:h-10 rounded-xl bg-slate-400 p-1"
+								:class="this.formulario.chain != 'Ethereum' && this.formulario.chain != ''?'blur-sm':''" />
+						</div>
+					</div>
+			</div>
+			<div class="flex w-full justify-center mt-2">
+				<div class="mr-2">
+					<input type="text" size="50"
+						class="border border-amber-600 text-black font-bold rounded-lg text-center bg-slate-300 text-xs sm:text-base"
+						placeholder="Account Address"
+						v-model="formulario.account"
+						@keyup="findChain"
+						>
 				</div>
-				<div class="mx-2" :class="this.formulario.chain == 'Solana'?'border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
-					<img src="@/assets/images/Solana.png" class="inline h-10 rounded-xl bg-slate-400 p-2" />
-				</div>
-				<div class="mx-2" :class="this.formulario.chain == 'Ethereum'?'border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
-					<img src="@/assets/images/Ethereum.png" class="inline h-10 rounded-xl bg-slate-400 p-1" />
+				<div>
+					<button
+						type="submit" @click.prevent="submit"
+						:class="disableSubmitButton?'hover:cursor-not-allowed opacity-40':''"
+						class="rounded-lg px-2 border border-blue-700 bg-blue-700 text-black font-bold text-xs sm:text-base hover:opacity-70 hover:border hover:border-amber-600">
+						LOAD
+					</button>
 				</div>
 			</div>
-		</div>
-		<div class="flex w-full justify-center mt-2">
-			<!-- <div class="mr-2">Account:</div> -->
-			<div class="mr-2">
-				<input type="text" size="50"
-					class="border border-amber-600 text-black font-bold rounded-lg text-center bg-slate-300 text-xs sm:text-base"
-					placeholder="Address"
-					v-model="formulario.account"
-					@keyup="findChain"
-					>
-			</div>
-			<div>
-				<button
-					type="submit" @click.prevent="submit"
-					:class="disableSubmitButton?'hover:cursor-not-allowed opacity-50':''"
-					class="rounded-lg px-2 border border-blue-700 bg-blue-700 text-black font-bold hover:opacity-70 hover:border hover:border-amber-600">
-					Load NFTs
-				</button>
-			</div>
-		</div>
+		</form>
 	</div>
+	<GalleryShowETH v-if="showGallery && formulario.chain == 'Ethereum'" :address=formulario.account />
+	<GalleryShowHedera v-if="showGallery && formulario.chain == 'Hedera'" :address=formulario.account />
+	<GalleryShowSolana v-if="showGallery && formulario.chain == 'GalleryShowSolana'" :address=formulario.account />
 </template>
 
 <script>
 import { PublicKey } from '@solana/web3.js'
 import Web3 from 'web3';
+import GalleryShowETH from './GalleryShowETH.vue'
+import GalleryShowHedera from './GalleryShowHedera.vue'
+import GalleryShowSolana from './GalleryShowSolana.vue'
 
 export default {
 	name: 'InputData',
+	components: {
+		GalleryShowETH,
+		GalleryShowHedera,
+		GalleryShowSolana
+	},
 	data() {
 		return {
 			formulario:{
@@ -51,18 +66,20 @@ export default {
 				account: ''
 			},
 			disableSubmitButton: true,
-			errores: []
+			showGallery: false
 		}
 	},
 	methods: {
 		findChain() {
 			// Ethereum - 0xAa9FB1a84b38B2510160C75Cc8ce12A6e6CEd432
-			// Hedera - 0.0.1074226 o 0.0.1074226-bogfa
-			// Hedera - /^0\.0\.[1-9]\d{0,4}$/
-			// 0.0.12345
+			// Hedera - 0.0.1074226
+			// Hedera - 0.0.1074226-bogfa
+			// Hedera - 0.0.848819
+
 			// Solana - C66MoRaMasyasFUuHNv22VP3qdztepPXDXanuRH6Lvex
-			// Solana - 9ig8oacMxvVWgLv8pXmL1fcjErwn75WYDs5CTdDnYCNm
-			// Solana - worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTtha
+			this.formulario.chain = '';
+			this.disableSubmitButton = true;
+			this.showGallery = false;
 			if (/^0x[a-fA-F0-9]{40}$/.test(this.formulario.account)) {
 				if (Web3.utils.isAddress(this.formulario.account)){
 					this.formulario.chain = 'Ethereum';
@@ -80,11 +97,13 @@ export default {
 				} catch {
 					//a
 				}
-			} else {
-				this.formulario.chain = '';
-				this.disableSubmitButton = true;
 			}
 		},
+		submit(){
+			if (this.formulario.chain != ''){
+				this.showGallery = true;
+			}
+		}
 	}
 }
 </script>
