@@ -2,6 +2,7 @@
 // import { EvmChain } from '@moralisweb3/evm-utils';
 import { Buffer } from 'buffer'
 import { UrlRender } from './Utils.js'
+import axios from 'axios'
 
 const AlchemyApiKey = process.env.VUE_APP_AlchemyApiKey
 const MoralisApiKey = process.env.VUE_APP_MoralisApiKey
@@ -140,6 +141,24 @@ async function GetHederaTokenInfo(_TokenId){
 	return {name:RespTokenInfo.name,symbol:RespTokenInfo.symbol,fees: Number((Fees*100).toFixed(2)),total_supply:RespTokenInfo.total_supply}
 }
 
+export async function GetMetadataNFT(_Url) {
+	let ImageURL = null
+	let ImageType = null
+	let respMetadata = null
+	if (!_Url) return {ImageURL,ImageType}
+	try{
+		const resp = await axios.get(_Url,{timeout:2500})
+		respMetadata = resp.data
+	} catch (err) {
+		console.error(err.message, "GetMetadataNFT:", _Url);
+	}
+	if (respMetadata) {
+		ImageURL = respMetadata.image?.description?UrlRender(respMetadata.image.description):respMetadata.image?UrlRender(respMetadata.image):respMetadata.CID?UrlRender(respMetadata.CID):null
+		ImageType = respMetadata.type?respMetadata.type:null
+	}
+	return {ImageURL,ImageType}
+}
+
 export async function GetHederaNFTs(_Account) {
 	const BaseURL = 'https://mainnet-public.mirrornode.hedera.com'
 	let URL = BaseURL + '/api/v1/accounts/' + _Account + '/nfts?limit=100'
@@ -148,26 +167,14 @@ export async function GetHederaNFTs(_Account) {
 	let Total = 0
 	try {
 		while (!Fin) {
+			console.log("GetHederaNFTs:",URL)
 			const res = await fetch(URL);
 			const RespListaNFTs = await res.json();
 			for (let i = 0; i < RespListaNFTs.nfts.length; i++) {
-				let TokenAddress, TokenId, MetadataURL, ImageURL, ImageType
+				let TokenAddress, TokenId, MetadataURL
 				TokenAddress = RespListaNFTs.nfts[i].token_id?RespListaNFTs.nfts[i].token_id:""
 				TokenId = RespListaNFTs.nfts[i].serial_number?RespListaNFTs.nfts[i].serial_number:""
 				MetadataURL = UrlRender(Buffer.from(RespListaNFTs.nfts[i].metadata, 'base64').toString('ascii'))
-				ImageURL = null
-				ImageType = null
-				if (MetadataURL) {
-					try{
-						const resp = await fetch(MetadataURL);
-						const respMetadata = await resp.json();
-						ImageURL = UrlRender(respMetadata.image)
-						ImageType = respMetadata.type?respMetadata.type:null
-					} catch (err) {
-						console.error(err.message, "GetUrl:", MetadataURL);
-					}
-				}
-	
 				if (!Object.prototype.hasOwnProperty.call(Nfts, TokenAddress)) {
 					const TokenInfo = await GetHederaTokenInfo(TokenAddress)
 					Nfts[TokenAddress] = {
@@ -176,6 +183,7 @@ export async function GetHederaNFTs(_Account) {
 						symbol: TokenInfo.symbol,
 						fees: TokenInfo.fees,
 						supply: TokenInfo.total_supply,
+						selected: false,
 						nfts: []
 					}
 				}
@@ -183,8 +191,8 @@ export async function GetHederaNFTs(_Account) {
 					{
 						serial_number: TokenId,
 						metadata_url: MetadataURL,
-						image: ImageURL,
-						type: ImageType
+						image: null,
+						type: null
 					}
 				)
 				Total += 1

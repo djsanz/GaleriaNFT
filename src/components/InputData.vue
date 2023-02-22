@@ -75,6 +75,9 @@ export default {
 			// Hedera - 0.0.1074226
 			// Hedera - 0.0.1074226-bogfa
 			// Hedera - 0.0.848819
+			// Hedera - 0.0.640856 Video y Fichero GLB
+			// Hedera - 0.0.996099 ASHFALL
+			// Hedera - 0.0.523118
 
 			// Solana - C66MoRaMasyasFUuHNv22VP3qdztepPXDXanuRH6Lvex
 			this.formulario.chain = '';

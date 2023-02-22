@@ -2,6 +2,9 @@ export function UrlRender(_URL) {
     let src = null;
     if (_URL){
         try{
+			if (typeof miVariable !== "string"){
+				_URL = _URL.toString()
+			}
             const UrlOrigen = _URL.split('//');
             if (UrlOrigen?.length === 2) {
                 switch (UrlOrigen[0].toLowerCase()) {
