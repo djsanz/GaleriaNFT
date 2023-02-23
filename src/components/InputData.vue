@@ -24,16 +24,15 @@
 				<div class="mr-2 flex flex-1">
 					<input type="text"
 						class="flex flex-1 border-amber-600 text-black font-bold rounded-lg text-center bg-slate-300 text-xs sm:text-base"
-						placeholder="Account Address"
-						v-model="formulario.account"
-						@keyup="findChain"
+						placeholder="Account Address" v-model="formulario.account"
+						@keyup="findChain($event)" @submit="submit"
 						>
 				</div>
 				<div>
 					<button
-						type="submit" @click.prevent="submit"
+						type="submit"
 						:class="disableSubmitButton?'hover:cursor-not-allowed opacity-40':''"
-						class="rounded-lg px-2 border border-blue-700 bg-blue-700 text-black font-bold text-xs sm:text-base hover:opacity-70 hover:border hover:border-amber-600">
+						class="rounded-lg px-2 border border-blue-700 bg-blue-700 text-black font-bold hover:opacity-70 hover:border hover:border-amber-600">
 						LOAD
 					</button>
 				</div>
@@ -42,7 +41,7 @@
 	</div>
 	<GalleryShowETH v-if="showGallery && formulario.chain == 'Ethereum'" :address=formulario.account />
 	<GalleryShowHedera v-if="showGallery && formulario.chain == 'Hedera'" :address=formulario.account />
-	<GalleryShowSolana v-if="showGallery && formulario.chain == 'GalleryShowSolana'" :address=formulario.account />
+	<GalleryShowSolana v-if="showGallery && formulario.chain == 'Solana'" :address=formulario.account />
 </template>
 
 <script>
@@ -70,7 +69,10 @@ export default {
 		}
 	},
 	methods: {
-		findChain() {
+		findChain(event) {
+			if (event.code == 'Enter'){
+				return
+			}
 			// Ethereum - 0xAa9FB1a84b38B2510160C75Cc8ce12A6e6CEd432
 			// Hedera - 0.0.1074226
 			// Hedera - 0.0.1074226-bogfa
@@ -80,6 +82,8 @@ export default {
 			// Hedera - 0.0.523118
 
 			// Solana - C66MoRaMasyasFUuHNv22VP3qdztepPXDXanuRH6Lvex
+			// Solana - ACzcgz7gq2qiKKaCxvGCPB3DU4Hne2CztqH1sDuYWsfF
+
 			this.formulario.chain = '';
 			this.disableSubmitButton = true;
 			this.showGallery = false;

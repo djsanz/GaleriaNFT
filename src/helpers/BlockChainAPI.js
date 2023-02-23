@@ -64,6 +64,57 @@ export async function GetAlchemyNFTs(_Address, _SubChain) {
 	}
 }
 
+export async function GetSolanaNFTs(_Address) {
+	// https://solana-gateway.moralis.io/account/mainnet/ACzcgz7gq2qiKKaCxvGCPB3DU4Hne2CztqH1sDuYWsfF/nft
+	const Url = `https://solana-gateway.moralis.io/account/mainnet/${_Address}/nft`
+	var myHeaders = new Headers();
+	myHeaders.append("X-API-Key", MoralisApiKey);
+	var requestOptions = {
+		method: 'GET',
+		headers: myHeaders,
+		redirect: 'follow'
+	}
+	try {
+		const res = await fetch(Url, requestOptions);
+		const data = await res.json();
+		let Nfts = {}
+		let Total = 0
+		for (let i = 0; i < data.length; i++) {
+			var config = {
+				method: 'get',
+				maxBodyLength: Infinity,
+				url: `https://solana-gateway.moralis.io/nft/mainnet/${data[i].mint}/metadata`,
+				headers: { 'X-API-Key': MoralisApiKey},
+				timeout: 2500
+			}
+			const NftInfo = await axios(config)
+			if (!Object.prototype.hasOwnProperty.call(Nfts, data[i].symbol)) {
+				Nfts[data[i].symbol] = {
+					token_id: data[i].symbol,
+					name: data[i].name?data[i].name:data[i].symbol,
+					symbol: data[i].symbol,
+					fees: null,
+					supply: null,
+					selected: false,
+					nfts: []
+				}
+			}
+			Nfts[data[i].symbol].nfts.push(
+				{
+					serial_number:NftInfo.data.mint,
+					metadata_url: NftInfo.data.metaplex.metadataUri,
+					image: null,
+					type: null
+				}
+			)
+			Total += 1
+		}
+		return { Colecciones: Nfts, Total: Total };
+	} catch (err) {
+		console.error(err.message, "Url:", Url);
+	}
+
+}
 export async function GetMoralisNFTs(_Address, _SubChain) {
 	// curl --request GET \
 	//  --url 'https://deep-index.moralis.io/api/v2/0xd8da6bf26964af9d7eed9e03e53415d37aa96045/nft?chain=bsc&format=decimal' \

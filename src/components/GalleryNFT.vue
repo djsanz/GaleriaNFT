@@ -21,10 +21,10 @@
 					<div class="px-2">
 						NFTs: {{ NFTs.Colecciones[Index].nfts.length }}
 					</div>
-					<div class="px-2">
+					<div v-if="NFTs.Colecciones[Index].supply" class="px-2">
 						Supply: {{ NFTs.Colecciones[Index].supply }}
 					</div>
-					<div class="px-2">
+					<div v-if="NFTs.Colecciones[Index].fees" class="px-2">
 						Fees: {{ NFTs.Colecciones[Index].fees }}%
 					</div>
 				</div>
@@ -33,7 +33,7 @@
 			<div v-if:="NFTs.Colecciones[Index].selected" className="bg-gray-800 rounded-md justify-center flex flex-wrap m-2">
 				<div v-for="NFT in NFTs.Colecciones[Index].nfts" class="m-1 my-3 flex flex-col place-content-center" :key="Index + NFT.serial_number">
 					<div className="border rounded-t flex place-content-center bg-gray-900">
-						<p className="text-xs md:text-sm lg:text-sm text-white mx-1 capitalize">{{ NFT.serial_number }}</p>
+						<p className="text-xs md:text-sm lg:text-sm text-white mx-1 capitalize">{{ NFT.serial_number.length<12?NFT.serial_number:NFT.serial_number.substring(0, 7)+"..."+NFT.serial_number.substring(NFT.serial_number.length-7,NFT.serial_number.length) }}</p>
 					</div>
 					<div className="border flex place-content-center">
 						<ImageNFT :src="NFT.image?NFT.image:''" alt="NFT" :type="NFT.type?NFT.type:''" className="h-32 sm:h-40" />

@@ -3,9 +3,6 @@
       <img src="../assets/gif/Loading.gif" alt='LoadingIMG'/>
     </div>
 	<div class="flex flex-col align-middle items-center justify-center border border-amber-900 rounded-xl">
-		<!-- <div class="text-3xl font-bold">
-			Hedera
-		</div> -->
 		<GalleryNFT :ListaNFTs="NFTs" />
 	</div>
 </template>

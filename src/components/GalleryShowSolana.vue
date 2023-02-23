@@ -1,52 +1,15 @@
 <template>
-	<div class="flex flex-col align-middle items-center justify-center border">
-		<div class="text-3xl font-bold">
-			GalleryShow
-		</div>
-		<div class="text-xl font-bold">
-			Address: {{ address }}
-		</div>
-
-		<div class="text-2xl font-bold text-red-500">
-			SubChain: "Ethereum" - {{ ethNFTs.Total }}
-		</div>
-		<div v-for="Colleccion in ethNFTs.Colleciones" :key="Colleccion.token_id">
-			<div class="">
-				{{ Colleccion.name }} - {{ Colleccion.symbol }} - {{ Colleccion.nfts.length }}
-			</div>
-		</div>
-<!-- 
-		<div class="text-2xl font-bold text-red-500">
-			SubChain: "Polygon" - {{ polygonNFTs.Total }}
-		</div>
-		<div v-for="Colleccion in polygonNFTs.Colleciones" :key="Colleccion.token_id">
-			<div class="">
-				{{ Colleccion.name }} - {{ Colleccion.symbol }} - {{ Colleccion.nfts.length }}
-			</div>
-		</div>
-
-		<div class="text-2xl font-bold text-red-500">
-			SubChain: "Arbitrum" - {{ ArbitrumNFTs.Total }}
-		</div>
-		<div v-for="Colleccion in ArbitrumNFTs.Colleciones" :key="Colleccion.token_id">
-			<div class="">
-				{{ Colleccion.name }} - {{ Colleccion.symbol }} - {{ Colleccion.nfts.length }}
-			</div>
-		</div>
-
-		<div class="text-2xl font-bold text-red-500">
-			SubChain: "Optimism" - {{ OptimismNFTs.Total }}
-		</div>
-		<div v-for="Colleccion in OptimismNFTs.Colleciones" :key="Colleccion.token_id">
-			<div class="">
-				{{ Colleccion.name }} - {{ Colleccion.symbol }} - {{ Colleccion.nfts.length }}
-			</div>
-		</div> -->
+	<div v-if="ShowCargando" className="fixed top-0 left-0 right-0 bg-black/80 flex items-center justify-center w-full h-screen">
+      <img src="../assets/gif/Loading.gif" alt='LoadingIMG'/>
+    </div>
+	<div class="flex flex-col align-middle items-center justify-center border border-amber-900 rounded-xl">
+		<GalleryNFT :ListaNFTs="NFTs" />
 	</div>
 </template>
 
 <script>
-import { EthSubChain, GetAlchemyNFTs, GetMoralisNFTs } from '../helpers/BlockChainAPI.js'
+import { GetSolanaNFTs } from '../helpers/BlockChainAPI.js'
+import GalleryNFT from './GalleryNFT.vue'
 
 export default {
 	name: 'GalleryShowSolana',
@@ -55,35 +18,19 @@ export default {
 			type: String
 		}
 	},
+	components: {
+		GalleryNFT
+	},
 	data() {
 		return {
-			ethNFTs: {},
-			polygonNFTs: {},
-			ArbitrumNFTs: {},
-			OptimismNFTs: {},
-			BinanceNFTs: {}
+			NFTs: {Colecciones:[],Total:0},
+			ShowCargando: true
 		}
 	},
-	mounted() {
-		GetAlchemyNFTs(this.address,EthSubChain.Ethereum).then((data) => {
-			this.ethNFTs = data
-			// console.log("Eth:",data)
-		})
-		// GetAlchemyNFTs(this.address,EthSubChain.Polygon).then((data) => {
-		// 	this.polygonNFTs = data
-		// })
-		// GetAlchemyNFTs(this.address,EthSubChain.Arbitrum).then((data) => {
-		// 	this.ArbitrumNFTs = data
-		// })
-		// GetAlchemyNFTs(this.address,EthSubChain.Optimism).then((data) => {
-		// 	this.OptimismNFTs = data
-		// })
-
-		// 0xd8da6bf26964af9d7eed9e03e53415d37aa96045
-		GetMoralisNFTs(this.address,"bsc").then((data) => {
-			this.BinanceNFTs = data
-		})
-		
+	beforeMount: async function () {
+		this.NFTs = await GetSolanaNFTs(this.address)
+		console.log("Nfts:",this.NFTs)
+		this.ShowCargando = false
 	}
 }
 </script>
