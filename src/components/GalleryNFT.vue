@@ -2,16 +2,21 @@
 	<div v-if="ShowCargando" className="fixed top-0 left-0 right-0 bg-black/80 flex items-center justify-center w-full h-screen">
       <img src="../assets/gif/Loading.gif" alt='LoadingIMG'/>
     </div>
-	<div class="border border-red-700 w-full">
-		<div class="text-xl font-bold mb-2">
-			Colecciones: {{ Object.keys(NFTs.Colecciones).length }} - NFTs: {{ NFTs.Total }}
+	<div class="w-full bg-slate-800 rounded-xl">
+		<div class="flex text-xl font-bold mb-2 justify-center rounded-t-xl bg-amber-900">
+			<div class="pr-3">
+				Colecciones: {{ Object.keys(NFTs.Colecciones).length }}
+			</div>
+			<div class="pl-3">
+				NFTs: {{ NFTs.Total }}
+			</div>
 		</div>
 		<div v-for="Index in Object.keys(NFTs.Colecciones)" class="border rounded-md flex-1 m-2 mr-3 bg-gray-900" :key="'Col' + Index">
 			<!-- Header -->
 			<div @click="async () => await SelectCol(Index)" class="flex flex-1 m-0.5 hover:bg-gray-700 cursor-pointer">
-				<div class="mx-2 flex flex-1 place-content-start text-xs md:text-base lg:text-base items-center">
+				<div class="mx-2 flex flex-1 place-content-start text-xs sm:text-base items-center">
 					<div class="px-2 text-start flex-1">
-						Coleccion: {{ NFTs.Colecciones[Index].name }}
+						{{ NFTs.Colecciones[Index].name }}
 					</div>
 					<div class="px-2">
 						NFTs: {{ NFTs.Colecciones[Index].nfts.length }}
@@ -31,7 +36,7 @@
 						<p className="text-xs md:text-sm lg:text-sm text-white mx-1 capitalize">{{ NFT.serial_number }}</p>
 					</div>
 					<div className="border flex place-content-center">
-						<ImageNFT :src="NFT.image?NFT.image:''" alt="NFT" :type="NFT.type?NFT.type:''" className="max-w-32 h-32" />
+						<ImageNFT :src="NFT.image?NFT.image:''" alt="NFT" :type="NFT.type?NFT.type:''" className="h-32 sm:h-40" />
 					</div>
 					<div className="border rounded-b flex place-content-center bg-gray-900">
 						<a :href="NFT.metadata_url" target="_blank" rel="noreferrer" className="text-xs font-bold text-blue-400 hover:text-white">Metadata</a>

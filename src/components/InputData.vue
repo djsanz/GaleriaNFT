@@ -1,29 +1,29 @@
 <template>
-	<div class="flex flex-col align-middle items-center justify-center text-center p-2">
+	<div class="flex flex-col align-middle items-center justify-center text-center pb-2">
 		<form @submit.prevent="submit">
 			<div class="flex w-full">
-					<div class="flex flex-1 justify-center items-center align-middle h-12 sm:h-16">
-						<div class="mx-2" :class="this.formulario.chain == 'Hedera'?'border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
-							<img
-								src="@/assets/images/Hedera.png" class="inline h-8 sm:h-10 rounded-xl bg-slate-400 p-2"
-								:class="this.formulario.chain != 'Hedera' && this.formulario.chain != ''?'blur-sm':''" />
-						</div>
-						<div class="mx-2" :class="this.formulario.chain == 'Solana'?'border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
-							<img
-								src="@/assets/images/Solana.png" class="inline h-8 sm:h-10 rounded-xl bg-slate-400 p-2"
-								:class="this.formulario.chain != 'Solana' && this.formulario.chain != ''?'blur-sm':''" />
-						</div>
-						<div class="mx-2" :class="this.formulario.chain == 'Ethereum'?' border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
-							<img
-								src="@/assets/images/Ethereum.png" class="inline h-8 sm:h-10 rounded-xl bg-slate-400 p-1"
-								:class="this.formulario.chain != 'Ethereum' && this.formulario.chain != ''?'blur-sm':''" />
-						</div>
+				<div class="flex flex-1 justify-center items-center align-middle h-12 sm:h-16">
+					<div class="mx-2" :class="this.formulario.chain == 'Hedera'?'border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
+						<img
+							src="@/assets/images/Hedera.png" class="inline h-7 sm:h-10 rounded-xl bg-slate-400 p-2"
+							:class="this.formulario.chain != 'Hedera' && this.formulario.chain != ''?'blur-sm':''" />
 					</div>
+					<div class="mx-2" :class="this.formulario.chain == 'Solana'?'border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
+						<img
+							src="@/assets/images/Solana.png" class="inline h-7 sm:h-10 rounded-xl bg-slate-400 p-2"
+							:class="this.formulario.chain != 'Solana' && this.formulario.chain != ''?'blur-sm':''" />
+					</div>
+					<div class="mx-2" :class="this.formulario.chain == 'Ethereum'?' border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
+						<img
+							src="@/assets/images/Ethereum.png" class="inline h-7 sm:h-10 rounded-xl bg-slate-400 p-1"
+							:class="this.formulario.chain != 'Ethereum' && this.formulario.chain != ''?'blur-sm':''" />
+					</div>
+				</div>
 			</div>
 			<div class="flex w-full justify-center mt-2">
-				<div class="mr-2">
-					<input type="text" size="50"
-						class="border border-amber-600 text-black font-bold rounded-lg text-center bg-slate-300 text-xs sm:text-base"
+				<div class="mr-2 flex flex-1">
+					<input type="text"
+						class="flex flex-1 border-amber-600 text-black font-bold rounded-lg text-center bg-slate-300 text-xs sm:text-base"
 						placeholder="Account Address"
 						v-model="formulario.account"
 						@keyup="findChain"

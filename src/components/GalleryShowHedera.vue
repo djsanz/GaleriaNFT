@@ -2,10 +2,10 @@
 	<div v-if="ShowCargando" className="fixed top-0 left-0 right-0 bg-black/80 flex items-center justify-center w-full h-screen">
       <img src="../assets/gif/Loading.gif" alt='LoadingIMG'/>
     </div>
-	<div class="flex flex-col align-middle items-center justify-center border">
-		<div class="text-3xl font-bold">
+	<div class="flex flex-col align-middle items-center justify-center border border-amber-900 rounded-xl">
+		<!-- <div class="text-3xl font-bold">
 			Hedera
-		</div>
+		</div> -->
 		<GalleryNFT :ListaNFTs="NFTs" />
 	</div>
 </template>

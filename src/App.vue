@@ -1,5 +1,5 @@
 <template>
-	<div class="font-Roboto flex-row h-full min-h-screen text-center text-white bg-black bg-gradient-to-r from-gray-900 pt-2 sm:pt-4 px-2 sm:px-10 space-y-5 pb-4">
+	<div class="font-Roboto flex-row h-full min-h-screen text-center text-white bg-black bg-gradient-to-r from-gray-900 pt-2 sm:pt-4 px-2 sm:px-10 space-y-2">
 		<TituloApp/>
 		<InputData/>
 	</div>
