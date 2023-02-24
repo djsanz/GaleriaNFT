@@ -3,7 +3,7 @@
       <img src="../assets/gif/Loading.gif" alt='LoadingIMG'/>
     </div>
 	<div class="flex flex-col align-middle items-center justify-center border border-amber-900 rounded-xl">
-		<GalleryNFT :ListaNFTs="NFTs" />
+		<GalleryNFT :ListaNFTs="NFTs" Chain="Hedera"/>
 	</div>
 </template>
 

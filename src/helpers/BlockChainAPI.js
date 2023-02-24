@@ -88,10 +88,17 @@ export async function GetSolanaNFTs(_Address) {
 				timeout: 2500
 			}
 			const NftInfo = await axios(config)
-			if (!Object.prototype.hasOwnProperty.call(Nfts, data[i].symbol)) {
-				Nfts[data[i].symbol] = {
-					token_id: data[i].symbol,
-					name: data[i].name?data[i].name:data[i].symbol,
+			let SerialNumber = NftInfo.data.mint
+			let Name = data[i].name?data[i].name:data[i].symbol
+			const Partes = Name.split(" #")
+			if (Partes.length > 1) {
+				Name = Partes[0]
+				SerialNumber = Partes[1]
+			}
+			if (!Object.prototype.hasOwnProperty.call(Nfts, Name)) {
+				Nfts[Name] = {
+					token_id: data[i].mint,
+					name: Name,
 					symbol: data[i].symbol,
 					fees: null,
 					supply: null,
@@ -99,12 +106,13 @@ export async function GetSolanaNFTs(_Address) {
 					nfts: []
 				}
 			}
-			Nfts[data[i].symbol].nfts.push(
+			Nfts[Name].nfts.push(
 				{
-					serial_number:NftInfo.data.mint,
+					serial_number:SerialNumber,
 					metadata_url: NftInfo.data.metaplex.metadataUri,
 					image: null,
-					type: null
+					type: null,
+					token_id: data[i].mint
 				}
 			)
 			Total += 1
@@ -225,6 +233,9 @@ export async function GetHederaNFTs(_Account) {
 				let TokenAddress, TokenId, MetadataURL
 				TokenAddress = RespListaNFTs.nfts[i].token_id?RespListaNFTs.nfts[i].token_id:""
 				TokenId = RespListaNFTs.nfts[i].serial_number?RespListaNFTs.nfts[i].serial_number:""
+				if (typeof TokenId !== "string"){
+					TokenId = TokenId.toString()
+				}
 				MetadataURL = UrlRender(Buffer.from(RespListaNFTs.nfts[i].metadata, 'base64').toString('ascii'))
 				if (!Object.prototype.hasOwnProperty.call(Nfts, TokenAddress)) {
 					const TokenInfo = await GetHederaTokenInfo(TokenAddress)

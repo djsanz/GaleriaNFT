@@ -32,8 +32,20 @@
 			<!-- Galería -->
 			<div v-if:="NFTs.Colecciones[Index].selected" className="bg-gray-800 rounded-md justify-center flex flex-wrap m-2">
 				<div v-for="NFT in NFTs.Colecciones[Index].nfts" class="m-1 my-3 flex flex-col place-content-center" :key="Index + NFT.serial_number">
-					<div className="border rounded-t flex place-content-center bg-gray-900">
-						<p className="text-xs md:text-sm lg:text-sm text-white mx-1 capitalize">{{ NFT.serial_number.length<12?NFT.serial_number:NFT.serial_number.substring(0, 7)+"..."+NFT.serial_number.substring(NFT.serial_number.length-7,NFT.serial_number.length) }}</p>
+					<div className="border rounded-t flex place-content-center bg-gray-900 min-w-max">
+						<div class="basis-1/6 min-w-fit">
+							<a v-if="LinkMarket(Index)" :href="LinkMarket(Index)" target="_blank" className="" >
+								<img src="@/assets/icons/cart.svg" alt="MarketIcon" className="h-6 p-1" />
+							</a>
+						</div>
+						<div className="flex flex-1 justify-center text-white">
+							{{ NFT.serial_number.length<12?NFT.serial_number:Acorta(NFT.serial_number) }}
+						</div>
+						<div class="basis-1/6 min-w-fit">
+							<a v-if="LinkExplorer(Index)" :href="LinkExplorer(NFT.token_id?NFT.token_id:NFTs.Colecciones[Index].token_id)" target="_blank" className="">
+								<img src="@/assets/icons/explorer.svg" alt="SearchIcon" className="h-6 p-1" />
+							</a>
+						</div>
 					</div>
 					<div className="border flex place-content-center">
 						<ImageNFT :src="NFT.image?NFT.image:''" alt="NFT" :type="NFT.type?NFT.type:''" className="h-32 sm:h-40" />
@@ -56,6 +68,9 @@ export default {
 	props: {
 		ListaNFTs: {
 			type: Object
+		},
+		Chain: {
+			type: String
 		}
 	},
 	components: {
@@ -64,10 +79,28 @@ export default {
 	data: function () {
 		return {
 			NFTs: {},
-			ShowCargando: false
+			ShowCargando: false,
+			Markets: {
+				Hedera: {
+						MCol:"https://zuse.market/collection/<COL>",
+						SCol:"https://hashscan.io/mainnet/token/<COL>"
+					},
+				Solana: {
+						SCol:"https://solscan.io/token/<COL>"
+					}
+				}
 		}
 	},
 	methods: {
+		Acorta(Text){
+			return Text.substring(0, 7)+"..."+Text.substring(Text.length-7,Text.length)
+		},
+		LinkMarket(Col){
+			return this.Markets[this.Chain].MCol?this.Markets[this.Chain].MCol.replace("<COL>",Col.toLowerCase()):null
+		},
+		LinkExplorer(Col){
+			return this.Markets[this.Chain].SCol?this.Markets[this.Chain].SCol.replace("<COL>",Col):null
+		},
 		async SelectCol(Index) {
 			if (!this.NFTs.Colecciones[Index].selected) {
 				this.ShowCargando = true
