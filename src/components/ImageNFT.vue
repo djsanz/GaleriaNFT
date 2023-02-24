@@ -1,10 +1,10 @@
 <template>
-	<a :href="SRC" target="_blank" rel="noreferrer">
+	<a :href="SRC.startsWith('data:')?null:SRC" target="_blank" rel="noreferrer">
 		<img v-if="Error" src="@/assets/images/404.png" :alt="ALT" :class="CLASSNAME" :type="TYPE" />
 		<img v-else-if="!Loaded" src="@/assets/gif/Loading.gif" :alt="ALT" :class="CLASSNAME" :type="TYPE" />
 		<img v-if="TipoImagen.includes(TYPE) || !TYPE" v-show="Loaded" :src="SRC" :alt="ALT" :class="CLASSNAME" :type="TYPE" @load="LoadImage" @error="SetError"/>
-		<video v-else-if="TYPE=='video/mp4'" :class="CLASSNAME" autoPlay muted loop>
-			<source :src="SRC" :type="TYPE" />
+		<video v-else-if="TYPE=='video/mp4' || TYPE=='mp4'" :class="CLASSNAME" autoPlay muted loop>
+			<source :src="SRC" type='video/mp4' />
 			Your browser does not support the video tag.
 		</video>
 		<img v-else src="@/assets/images/404.png" :alt="ALT" :class="CLASSNAME" :type="TYPE" />
@@ -38,7 +38,7 @@ export default {
 			CLASSNAME: this.className,
 			Loaded: false,
 			Error: false,
-			TipoImagen: ["image/png", "image/jpg", "image/jpeg", "image/gif","image/svg+xml"]
+			TipoImagen: ["image/png", "image/jpg", "image/jpeg", "image/gif","image/svg+xml","gif","jpg","jpeg","png","svg+xml","svg+xml; charset=utf-8"]
 		}
 	},
 	methods: {
@@ -50,7 +50,7 @@ export default {
 		}
 	},
 	beforeMount: function () {
-		if ((!this.SRC) && (this.TYPE == "")){
+		if ((this.SRC != null) && (this.TYPE == "")){
 			if (this.SRC.slice(-4) == ".glb"){
 				this.TYPE = "model/gltf-binary"
 			}else if (this.SRC.slice(-4) == ".gltf") {

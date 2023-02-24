@@ -42,6 +42,7 @@
 	<GalleryShowETH v-if="showGallery && formulario.chain == 'Ethereum'" :address=formulario.account />
 	<GalleryShowHedera v-if="showGallery && formulario.chain == 'Hedera'" :address=formulario.account />
 	<GalleryShowSolana v-if="showGallery && formulario.chain == 'Solana'" :address=formulario.account />
+	<div class="flex flex-col align-middle items-center justify-center text-center pb-2"></div>
 </template>
 
 <script>
@@ -74,6 +75,10 @@ export default {
 				return
 			}
 			// Ethereum - 0xAa9FB1a84b38B2510160C75Cc8ce12A6e6CEd432
+			// Ethereum - 0x0DEc0C4768Fb5987D581AeA5E2ECBe0D6a490784
+			// Ethereum - 0x677F828b252e02E7050e7DDB43655cAEA1CB1F7e
+			// Ethereum - 0x543F3B7233F461935255ba32F71b9D910F91f6A0
+
 			// Hedera - 0.0.1074226
 			// Hedera - 0.0.1074226-bogfa
 			// Hedera - 0.0.848819

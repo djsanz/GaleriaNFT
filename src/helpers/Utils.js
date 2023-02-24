@@ -5,6 +5,9 @@ export function UrlRender(_URL) {
 			if (typeof miVariable !== "string"){
 				_URL = _URL.toString()
 			}
+            if (_URL.startsWith('data:')) {
+                return _URL;
+            }
             const UrlOrigen = _URL.split('//');
             if (UrlOrigen?.length === 2) {
                 switch (UrlOrigen[0].toLowerCase()) {

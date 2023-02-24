@@ -7,10 +7,11 @@ import axios from 'axios'
 const AlchemyApiKey = process.env.VUE_APP_AlchemyApiKey
 const MoralisApiKey = process.env.VUE_APP_MoralisApiKey
 
-export const EthSubChain = Object.freeze({ Ethereum: "eth-mainnet", Polygon: "polygon-mainnet", Arbitrum: "arb-mainnet", Optimism: "opt-mainnet" });
+export const EthAlchemyChain = Object.freeze({ ethereum: "eth-mainnet", polygon: "polygon-mainnet", arbitrum: "arb-mainnet", optimism: "opt-mainnet" });
+export const EthMoralisChain = Object.freeze({ avalanche: "avalanche", bsc: "bsc", fantom: "fantom", cronos: "cronos", palm: "palm" });
 
 export async function GetAlchemyNFTs(_Address, _SubChain) {
-	// fetch('https://eth-mainnet.g.alchemy.com/nft/v2/docs-demo/getNFTs?owner=vitalik.eth&pageSize=100&withMetadata=false', options)
+	// https://docs.alchemy.com/reference/nft-api-quickstart
 	const Url = `https://${_SubChain}.g.alchemy.com/nft/v2/${AlchemyApiKey}/getNFTs?owner=${_Address}`
 	try {
 		const res = await fetch(Url);
@@ -19,32 +20,45 @@ export async function GetAlchemyNFTs(_Address, _SubChain) {
 			status: res.status,
 			data: data
 		};
-		console.log("Eth:", result)
+		// console.log("Eth:", result.data)
 		let ListaNFTsOrdenada = {}
 		let Total = 0
+		let Value = 0
 		for (let i = 0; i < result.data.ownedNfts.length; i++) {
 			let TokenAddress, TokenId, Name, Symbol
 			try { TokenAddress = result.data.ownedNfts[i].contract.address }
 			catch { TokenAddress = "" }
 			try { TokenId = result.data.ownedNfts[i].id.tokenId }
 			catch { TokenId = "" }
-			try { Name = result.data.ownedNfts[i].contractMetadata.name }
+			try { Name = result.data.ownedNfts[i].contractMetadata.name ? result.data.ownedNfts[i].contractMetadata.name : result.data.ownedNfts[i].metadata.name }
 			catch { Name = "" }
 			try { Symbol = result.data.ownedNfts[i].contractMetadata.symbol }
 			catch { Symbol = "" }
-			let MetadataURL, ImageURL, ImageType
+			let MetadataURL, ImageURL, ImageType, Supply, Fees, Floor
 			try { MetadataURL = result.data.ownedNfts[i].tokenUri.gateway }
 			catch { MetadataURL = null }
-			try { ImageURL = result.data.ownedNfts[i].media.gateway }
+			try { ImageURL = result.data.ownedNfts[i].metadata.animation_url ? UrlRender(result.data.ownedNfts[i].metadata.animation_url) : UrlRender(result.data.ownedNfts[i].metadata.image) }
 			catch { ImageURL = null }
-			try { ImageType = result.data.ownedNfts[i].media.format }
+			try { ImageType = result.data.ownedNfts[i].metadata.animation_url ? "video/mp4" : result.data.ownedNfts[i].media[0].format }
 			catch { ImageType = null }
+			try { Supply = result.data.ownedNfts[i].contractMetadata.totalSupply }
+			catch { Supply = null }
+			try { Fees = 0 }
+			catch { Fees = null }
+			try {
+				Floor = Number(result.data.ownedNfts[i].contractMetadata.openSea.floorPrice.toFixed(4))
+				Value += Floor
+			}
+			catch { Floor = null }
 
 			if (!Object.prototype.hasOwnProperty.call(ListaNFTsOrdenada, TokenAddress)) {
 				ListaNFTsOrdenada[TokenAddress] = {
 					token_id: TokenAddress,
 					name: Name,
 					symbol: Symbol,
+					fees: Fees,
+					supply: Supply,
+					floor: Floor,
 					nfts: []
 				}
 			}
@@ -58,7 +72,7 @@ export async function GetAlchemyNFTs(_Address, _SubChain) {
 			)
 			Total += 1
 		}
-		return { Colleciones: ListaNFTsOrdenada, Total: Total };
+		return { Colecciones: ListaNFTsOrdenada, Total: Total, Value: Number(Value.toFixed(4)) };
 	} catch (err) {
 		console.error(err.message, "Url:", Url);
 	}
@@ -84,12 +98,12 @@ export async function GetSolanaNFTs(_Address) {
 				method: 'get',
 				maxBodyLength: Infinity,
 				url: `https://solana-gateway.moralis.io/nft/mainnet/${data[i].mint}/metadata`,
-				headers: { 'X-API-Key': MoralisApiKey},
+				headers: { 'X-API-Key': MoralisApiKey },
 				timeout: 2500
 			}
 			const NftInfo = await axios(config)
 			let SerialNumber = NftInfo.data.mint
-			let Name = data[i].name?data[i].name:data[i].symbol
+			let Name = data[i].name ? data[i].name : data[i].symbol
 			const Partes = Name.split(" #")
 			if (Partes.length > 1) {
 				Name = Partes[0]
@@ -108,7 +122,7 @@ export async function GetSolanaNFTs(_Address) {
 			}
 			Nfts[Name].nfts.push(
 				{
-					serial_number:SerialNumber,
+					serial_number: SerialNumber,
 					metadata_url: NftInfo.data.metaplex.metadataUri,
 					image: null,
 					type: null,
@@ -117,21 +131,14 @@ export async function GetSolanaNFTs(_Address) {
 			)
 			Total += 1
 		}
-		return { Colecciones: Nfts, Total: Total };
+		return { Colecciones: Nfts, Total: Total, Value: 0 };
 	} catch (err) {
 		console.error(err.message, "Url:", Url);
 	}
 
 }
 export async function GetMoralisNFTs(_Address, _SubChain) {
-	// curl --request GET \
-	//  --url 'https://deep-index.moralis.io/api/v2/0xd8da6bf26964af9d7eed9e03e53415d37aa96045/nft?chain=bsc&format=decimal' \
-	//  --header 'accept: application/json' \
-	//  --header 'X-API-Key: YOUR_API_KEY' 
-
-	// const Moralis = require("moralis").default;
-	// await Moralis.start({apiKey: MoralisApiKey});
-	const Url = `https://deep-index.moralis.io/api/v2/${_Address}/nft?chain=${_SubChain}&format=decimal`
+	const Url = `https://deep-index.moralis.io/api/v2/${_Address}/nft?chain=${_SubChain}&format=decimal&normalizeMetadata=true`
 	var myHeaders = new Headers();
 	myHeaders.append("X-API-Key", MoralisApiKey);
 	var requestOptions = {
@@ -142,80 +149,81 @@ export async function GetMoralisNFTs(_Address, _SubChain) {
 	try {
 		const res = await fetch(Url, requestOptions);
 		const data = await res.json();
-		// console.log(data);
+		// console.log("MoralisRespBruto:",data);
+		let ListaNFTsOrdenada = {}
+		let Total = 0
+		for (let i = 0; i < data.result.length; i++) {
+			let TokenAddress, TokenId, Name, Symbol
+			try { TokenAddress = data.result[i].token_address }
+			catch { TokenAddress = "" }
+			try { TokenId = data.result[i].token_id }
+			catch { TokenId = "" }
+			try { Name = data.result[i].name }
+			catch { Name = "" }
+			try { Symbol = data.result[i].symbol }
+			catch { Symbol = "" }
+			let MetadataURL, ImageURL, ImageType
+			try { MetadataURL = data.result[i].token_uri }
+			catch { MetadataURL = null }
+			try { ImageURL = data.result[i].normalized_metadata.image }
+			catch { ImageURL = null }
+			try { ImageURL = data.result[i].normalized_metadata.animation_url ? UrlRender(data.result[i].normalized_metadata.animation_url) : UrlRender(data.result[i].normalized_metadata.image) }
+			catch { ImageURL = null }
+			try { ImageType = data.result[i].normalized_metadata.animation_url ? "video/mp4" : '' }
+			catch { ImageType = '' }
 
-		// let ListaNFTsOrdenada = {}
-		// for (let i = 0; i < result.data.ownedNfts.length; i++) {
-		// 	// Salida[result.data.ownedNfts[i].contract.address] = result.data[i].Fichero.slice(0,-4)
-		// 	let TokenAddress, TokenId, Name, Symbol
-		//     try{TokenAddress = result.data.ownedNfts[i].contract.address}
-		//     catch{TokenAddress = ""}
-		//     try{TokenId = result.data.ownedNfts[i].id.tokenId}
-		//     catch{TokenId = ""}
-		//     try{Name = result.data.ownedNfts[i].contractMetadata.name}
-		//     catch{Name = ""}
-		//     try{Symbol = result.data.ownedNfts[i].contractMetadata.symbol}
-		//     catch{Symbol = ""}
-		// 	let MetadataURL, ImageURL, ImageType
-		//     try{MetadataURL = result.data.ownedNfts[i].tokenUri.gateway}
-		//     catch{MetadataURL = null}
-		//     try{ImageURL = result.data.ownedNfts[i].media.gateway}
-		//     catch{ImageURL = null}
-		//     try{ImageType = result.data.ownedNfts[i].media.format}
-		//     catch{ImageType = null}
-
-		// 	// if (!ListaNFTsOrdenada.hasOwnProperty(TokenAddress)){
-		// 	if (!Object.prototype.hasOwnProperty.call(ListaNFTsOrdenada, TokenAddress)){
-		//         ListaNFTsOrdenada[TokenAddress] = {
-		//             token_id:TokenAddress,
-		//             name:Name,
-		//             symbol:Symbol,
-		//             nfts:[]
-		//         }
-		//     }
-		//     ListaNFTsOrdenada[TokenAddress].nfts.push(
-		//         {
-		//             serial_number:TokenId,
-		//             metadata_url:MetadataURL,
-		//             image:ImageURL,
-		//             type:ImageType
-		//         }
-		//     )
-		// }
-		return data;
+			if (!Object.prototype.hasOwnProperty.call(ListaNFTsOrdenada, TokenAddress)) {
+				ListaNFTsOrdenada[TokenAddress] = {
+					token_id: TokenAddress,
+					name: data.result[i].normalized_metadata.name ? data.result[i].normalized_metadata.name : Name,
+					symbol: Symbol,
+					nfts: []
+				}
+			}
+			ListaNFTsOrdenada[TokenAddress].nfts.push(
+				{
+					serial_number: TokenId,
+					metadata_url: MetadataURL,
+					image: ImageURL,
+					type: ImageType
+				}
+			)
+			Total += 1
+		}
+		return { Colecciones: ListaNFTsOrdenada, Total: Total, Value: 0 };
 	} catch (err) {
 		console.error(err.message, "Url:", Url);
 	}
 }
 
-async function GetHederaTokenInfo(_TokenId){
+async function GetHederaTokenInfo(_TokenId) {
 	const res = await fetch('https://mainnet-public.mirrornode.hedera.com/api/v1/tokens/' + _TokenId);
 	const RespTokenInfo = await res.json();
 	let Fees = 0
-	if (RespTokenInfo.custom_fees.royalty_fees){
+	if (RespTokenInfo.custom_fees.royalty_fees) {
 		RespTokenInfo.custom_fees.royalty_fees.forEach(Item => {
 			Fees += Item.amount.numerator / Item.amount.denominator
 		});
 	}
-	return {name:RespTokenInfo.name,symbol:RespTokenInfo.symbol,fees: Number((Fees*100).toFixed(2)),total_supply:RespTokenInfo.total_supply}
+	return { name: RespTokenInfo.name, symbol: RespTokenInfo.symbol, fees: Number((Fees * 100).toFixed(2)), total_supply: RespTokenInfo.total_supply }
 }
 
 export async function GetMetadataNFT(_Url) {
 	let ImageURL = null
 	let ImageType = null
 	let respMetadata = null
-	if (!_Url) return {ImageURL,ImageType}
-	try{
-		const resp = await axios.get(_Url,{timeout:2500})
+	if (!_Url) return { ImageURL, ImageType }
+	try {
+		const resp = await axios.get(_Url, { timeout: 2500 })
 		respMetadata = resp.data
 	} catch (err) {
 		console.error(err.message, "GetMetadataNFT:", _Url);
 	}
 	if (respMetadata) {
-		ImageURL = respMetadata.image?.description?UrlRender(respMetadata.image.description):respMetadata.image?UrlRender(respMetadata.image):respMetadata.CID?UrlRender(respMetadata.CID):null
-		ImageType = respMetadata.type?respMetadata.type:null
+		ImageURL = respMetadata.image?.description ? UrlRender(respMetadata.image.description) : respMetadata.image ? UrlRender(respMetadata.image) : respMetadata.CID ? UrlRender(respMetadata.CID) : null
+		ImageType = respMetadata.type ? respMetadata.type : null
 	}
-	return {ImageURL,ImageType}
+	return { ImageURL, ImageType }
 }
 
 export async function GetHederaNFTs(_Account) {
@@ -226,14 +234,14 @@ export async function GetHederaNFTs(_Account) {
 	let Total = 0
 	try {
 		while (!Fin) {
-			console.log("GetHederaNFTs:",URL)
+			// console.log("GetHederaNFTs:", URL)
 			const res = await fetch(URL);
 			const RespListaNFTs = await res.json();
 			for (let i = 0; i < RespListaNFTs.nfts.length; i++) {
 				let TokenAddress, TokenId, MetadataURL
-				TokenAddress = RespListaNFTs.nfts[i].token_id?RespListaNFTs.nfts[i].token_id:""
-				TokenId = RespListaNFTs.nfts[i].serial_number?RespListaNFTs.nfts[i].serial_number:""
-				if (typeof TokenId !== "string"){
+				TokenAddress = RespListaNFTs.nfts[i].token_id ? RespListaNFTs.nfts[i].token_id : ""
+				TokenId = RespListaNFTs.nfts[i].serial_number ? RespListaNFTs.nfts[i].serial_number : ""
+				if (typeof TokenId !== "string") {
 					TokenId = TokenId.toString()
 				}
 				MetadataURL = UrlRender(Buffer.from(RespListaNFTs.nfts[i].metadata, 'base64').toString('ascii'))

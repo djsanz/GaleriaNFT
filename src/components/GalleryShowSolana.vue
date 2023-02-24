@@ -29,7 +29,6 @@ export default {
 	},
 	beforeMount: async function () {
 		this.NFTs = await GetSolanaNFTs(this.address)
-		console.log("Nfts:",this.NFTs)
 		this.ShowCargando = false
 	}
 }
