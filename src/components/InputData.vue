@@ -1,32 +1,14 @@
 <template>
 	<div class="flex flex-col align-middle items-center justify-center text-center pb-2">
 		<form @submit.prevent="submit">
-			<div class="flex w-full">
-				<div class="flex flex-1 justify-center items-center align-middle h-12 sm:h-16">
-					<div class="mx-2" :class="this.formulario.chain == 'Hedera'?'border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
-						<img
-							src="@/assets/images/Hedera.png" class="inline h-7 sm:h-10 rounded-xl bg-slate-400 p-2"
-							:class="this.formulario.chain != 'Hedera' && this.formulario.chain != ''?'blur-sm':''" />
-					</div>
-					<div class="mx-2" :class="this.formulario.chain == 'Solana'?'border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
-						<img
-							src="@/assets/images/Solana.png" class="inline h-7 sm:h-10 rounded-xl bg-slate-400 p-2"
-							:class="this.formulario.chain != 'Solana' && this.formulario.chain != ''?'blur-sm':''" />
-					</div>
-					<div class="mx-2" :class="this.formulario.chain == 'Ethereum'?' border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
-						<img
-							src="@/assets/images/Ethereum.png" class="inline h-7 sm:h-10 rounded-xl bg-slate-400 p-1"
-							:class="this.formulario.chain != 'Ethereum' && this.formulario.chain != ''?'blur-sm':''" />
-					</div>
-				</div>
+			<div class="flex w-full justify-center mb-2 mt-2">
+				Enter Account Address to see NFTs:
 			</div>
-			<div class="flex w-full justify-center mt-2">
+			<div class="flex w-full justify-center mb-2 mt-2">
 				<div class="mr-2 flex flex-1">
 					<input type="text"
 						class="flex flex-1 border-amber-600 text-black font-bold rounded-lg text-center bg-slate-300 text-xs sm:text-base"
-						placeholder="Account Address" v-model="formulario.account"
-						@keyup="findChain($event)" @submit="submit"
-						>
+						placeholder="Account Address" v-model="account">
 				</div>
 				<div>
 					<button
@@ -37,11 +19,30 @@
 					</button>
 				</div>
 			</div>
+			<div class="flex w-full">
+				<div class="flex flex-1 justify-center items-center align-middle h-12 sm:h-16">
+					<div class="mx-2" :class="this.chain == 'Hedera'?'border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
+						<img
+							src="@/assets/images/Hedera.png" class="inline h-7 sm:h-10 rounded-xl bg-slate-400 p-2"
+							:class="this.chain != 'Hedera' && this.chain != ''?'blur-sm':''" />
+					</div>
+					<div class="mx-2" :class="this.chain == 'Solana'?'border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
+						<img
+							src="@/assets/images/Solana.png" class="inline h-7 sm:h-10 rounded-xl bg-slate-400 p-2"
+							:class="this.chain != 'Solana' && this.chain != ''?'blur-sm':''" />
+					</div>
+					<div class="mx-2" :class="this.chain == 'Ethereum'?' border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
+						<img
+							src="@/assets/images/Ethereum.png" class="inline h-7 sm:h-10 rounded-xl bg-slate-400 p-1"
+							:class="this.chain != 'Ethereum' && this.chain != ''?'blur-sm':''" />
+					</div>
+				</div>
+			</div>
 		</form>
 	</div>
-	<GalleryShowETH v-if="showGallery && formulario.chain == 'Ethereum'" :address=formulario.account />
-	<GalleryShowHedera v-if="showGallery && formulario.chain == 'Hedera'" :address=formulario.account />
-	<GalleryShowSolana v-if="showGallery && formulario.chain == 'Solana'" :address=formulario.account />
+	<GalleryShowETH v-if="showGallery && chain == 'Ethereum'" :address=account />
+	<GalleryShowHedera v-if="showGallery && chain == 'Hedera'" :address=account />
+	<GalleryShowSolana v-if="showGallery && chain == 'Solana'" :address=account />
 	<div class="flex flex-col align-middle items-center justify-center text-center pb-2"></div>
 </template>
 
@@ -61,49 +62,34 @@ export default {
 	},
 	data() {
 		return {
-			formulario:{
-				chain: '',
-				account: ''
-			},
+			chain: '',
+			account: '',
 			disableSubmitButton: true,
 			showGallery: false
 		}
 	},
+	watch: {
+		account: function () {
+			this.findChain()
+		}
+	},
 	methods: {
-		findChain(event) {
-			if (event.code == 'Enter'){
-				return
-			}
-			// Ethereum - 0xAa9FB1a84b38B2510160C75Cc8ce12A6e6CEd432
-			// Ethereum - 0x0DEc0C4768Fb5987D581AeA5E2ECBe0D6a490784
-			// Ethereum - 0x677F828b252e02E7050e7DDB43655cAEA1CB1F7e
-			// Ethereum - 0x543F3B7233F461935255ba32F71b9D910F91f6A0
-
-			// Hedera - 0.0.1074226
-			// Hedera - 0.0.1074226-bogfa
-			// Hedera - 0.0.848819
-			// Hedera - 0.0.640856 Video y Fichero GLB
-			// Hedera - 0.0.996099 ASHFALL
-			// Hedera - 0.0.523118
-
-			// Solana - C66MoRaMasyasFUuHNv22VP3qdztepPXDXanuRH6Lvex
-			// Solana - ACzcgz7gq2qiKKaCxvGCPB3DU4Hne2CztqH1sDuYWsfF
-
-			this.formulario.chain = '';
+		findChain() {
+			this.chain = '';
 			this.disableSubmitButton = true;
 			this.showGallery = false;
-			if (/^0x[a-fA-F0-9]{40}$/.test(this.formulario.account)) {
-				if (Web3.utils.isAddress(this.formulario.account)){
-					this.formulario.chain = 'Ethereum';
+			if (/^0x[a-fA-F0-9]{40}$/.test(this.account)) {
+				if (Web3.utils.isAddress(this.account)){
+					this.chain = 'Ethereum';
 					this.disableSubmitButton = false;
 				}
-			} else if (/^(0|(?:[1-9]\d*))\.(0|(?:[1-9]\d*))\.(0|(?:[1-9]\d*))(?:-([a-z]{5}))?$/.test(this.formulario.account)){
-					this.formulario.chain = 'Hedera';
+			} else if (/^(0|(?:[1-9]\d*))\.(0|(?:[1-9]\d*))\.(0|(?:[1-9]\d*))(?:-([a-z]{5}))?$/.test(this.account)){
+					this.chain = 'Hedera';
 					this.disableSubmitButton = false;
-			} else if (this.formulario.account.length == 44) {
+			} else if (this.account.length == 44) {
 				try {
-					if (PublicKey.isOnCurve(new PublicKey(this.formulario.account))){
-						this.formulario.chain = 'Solana';
+					if (PublicKey.isOnCurve(new PublicKey(this.account))){
+						this.chain = 'Solana';
 						this.disableSubmitButton = false;
 					}
 				} catch {
@@ -112,7 +98,7 @@ export default {
 			}
 		},
 		submit(){
-			if (this.formulario.chain != ''){
+			if (this.chain != ''){
 				this.showGallery = true;
 			}
 		}
