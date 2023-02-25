@@ -2,7 +2,7 @@
 	<div class="flex flex-col align-middle items-center justify-center text-center pb-2">
 		<form @submit.prevent="submit">
 			<div class="flex w-full justify-center mb-2 mt-2">
-				Enter Account Address to see NFTs:
+				Enter Account Address to see the NFTs:
 			</div>
 			<div class="flex w-full justify-center mb-2 mt-2">
 				<div class="mr-2 flex flex-1">
