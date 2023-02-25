@@ -5,7 +5,7 @@
 	<div class="w-full bg-slate-800 rounded-xl">
 		<div class="flex text-base sm:text-xl font-bold mb-2 justify-center rounded-t-xl bg-amber-900">
 			<div class="pr-3">
-				Colecciones: {{ Object.keys(NFTs.Colecciones).length }}
+				Collections: {{ Object.keys(NFTs.Colecciones).length }}
 			</div>
 			<div class="px-3">
 				NFTs: {{ NFTs.Total }}
