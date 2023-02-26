@@ -1,12 +1,12 @@
 <template>
-	<div class="flex flex-col align-middle items-center justify-center text-center pb-2">
+	<div class="flex overflow-hidden justify-center text-center pb-2">
 		<form @submit.prevent="submit">
-			<div class="flex w-full justify-center mb-2 mt-2">
+			<div class="flex justify-center mb-2 mt-2">
 				Enter Account Address to see the NFTs:
 			</div>
-			<div class="flex w-full justify-center mb-2 mt-2">
+			<div class="flex justify-center mb-2 mt-2">
 				<div class="mr-2 flex flex-1">
-					<input type="text"
+					<input type="text" name="address" id="address"
 						class="flex flex-1 border-amber-600 text-black font-bold rounded-lg text-center bg-slate-300 text-xs sm:text-base"
 						placeholder="Account Address" v-model="account">
 				</div>
@@ -19,8 +19,8 @@
 					</button>
 				</div>
 			</div>
-			<div class="flex w-full">
-				<div class="flex flex-1 justify-center items-center align-middle h-12 sm:h-16">
+			<div class="flex">
+				<div class="flex justify-center items-center align-middle h-12 sm:h-16">
 					<div class="mx-2" :class="this.chain == 'Hedera'?'border-green-600 border-2 rounded-xl p-2 bg-slate-800':''">
 						<img
 							src="@/assets/images/Hedera.png" class="inline h-7 sm:h-10 rounded-xl bg-slate-400 p-2"
@@ -40,10 +40,13 @@
 			</div>
 		</form>
 	</div>
-	<GalleryShowETH v-if="showGallery && chain == 'Ethereum'" :address=account />
-	<GalleryShowHedera v-if="showGallery && chain == 'Hedera'" :address=account />
-	<GalleryShowSolana v-if="showGallery && chain == 'Solana'" :address=account />
-	<div class="flex flex-col align-middle items-center justify-center text-center pb-2"></div>
+	<div class="flex-1">
+		<GalleryShowETH v-if="showGallery && chain == 'Ethereum'" :address=account />
+		<GalleryShowHedera v-if="showGallery && chain == 'Hedera'" :address=account />
+		<GalleryShowSolana v-if="showGallery && chain == 'Solana'" :address=account />
+	</div>
+	
+	<!-- <div class="flex flex-col align-middle items-center justify-center text-center pb-2"></div> -->
 </template>
 
 <script>

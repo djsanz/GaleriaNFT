@@ -2,7 +2,7 @@
 	<div v-if="ShowCargando" className="fixed top-0 left-0 right-0 bg-black/80 flex items-center justify-center w-full h-screen">
       <img src="../assets/gif/Loading.gif" alt='LoadingIMG'/>
     </div>
-	<div class="flex flex-wrap justify-center items-center align-middle p-2">
+	<div class="flex flex-wrap justify-center p-2">
 		<button @click="SelectChain('ethereum')" class="flex m-2 border-2 rounded-xl p-1" :class="SelectedChain == 'ethereum'?'border-green-600 border-2':SelectedChain?'opacity-20':''">
 			<div class="pr-2">
 				<img src="@/assets/chains/ethereum.webp" class="inline h-5 sm:h-8 rounded-full" />
