@@ -7,6 +7,7 @@
 			<source :src="SRC" type='video/mp4' />
 			Your browser does not support the video tag.
 		</video>
+		<iframe v-else-if="TYPE=='text/html'" width="100%" height="100%" title="Animation" :src="SRC"></iframe>
 		<img v-else src="@/assets/images/404.png" :alt="ALT" :class="CLASSNAME" :type="TYPE" />
 	</a>
 </template>
@@ -50,7 +51,7 @@ export default {
 		}
 	},
 	beforeMount: function () {
-		if ((this.SRC != null) && (this.TYPE == "")){
+		if ((this.SRC != null) && ((this.TYPE == "video/mp4")||(this.TYPE == ""))){
 			if (this.SRC.slice(-4) == ".glb"){
 				this.TYPE = "model/gltf-binary"
 			}else if (this.SRC.slice(-4) == ".gltf") {
@@ -65,6 +66,8 @@ export default {
 				this.TYPE = "image/jpeg"
 			}else if (this.SRC.slice(-4) == ".gif"){
 				this.TYPE = "image/gif"
+			}else if (this.SRC.slice(-5) == ".html"){
+				this.TYPE = "text/html"
 			}else if (this.TYPE == ""){
 				this.TYPE = "image/png"
 			}
