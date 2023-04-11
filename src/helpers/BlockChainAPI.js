@@ -227,11 +227,15 @@ export async function GetMetadataNFT(_Url) {
 }
 
 export async function GetHederaNFTs(_Account) {
+	const ZusePricesUrl = 'https://verifica-apijs.vercel.app/markets/ZuseMarket'
+	const ZusePricesRes = await fetch(ZusePricesUrl);
+	const ZusePrices = await ZusePricesRes.json();
 	const BaseURL = 'https://mainnet-public.mirrornode.hedera.com'
 	let URL = BaseURL + '/api/v1/accounts/' + _Account + '/nfts?limit=100'
 	let Nfts = {}
 	let Fin = false
 	let Total = 0
+	let Value = 0
 	try {
 		while (!Fin) {
 			// console.log("GetHederaNFTs:", URL)
@@ -254,6 +258,7 @@ export async function GetHederaNFTs(_Account) {
 						fees: TokenInfo.fees,
 						supply: TokenInfo.total_supply,
 						selected: false,
+						floor: ZusePrices[TokenAddress] ?? null,
 						nfts: []
 					}
 				}
@@ -265,6 +270,9 @@ export async function GetHederaNFTs(_Account) {
 						type: null
 					}
 				)
+				if (Nfts[TokenAddress].floor != null) {
+					Value += Number(Nfts[TokenAddress].floor.toFixed(4))
+				}
 				Total += 1
 			}
 			if (!RespListaNFTs.links.next) {
@@ -273,7 +281,7 @@ export async function GetHederaNFTs(_Account) {
 				URL = BaseURL + RespListaNFTs.links.next
 			}
 		}
-		return { Colecciones: Nfts, Total: Total };
+		return { Colecciones: Nfts, Total: Total, Value: Value };
 	} catch (err) {
 		console.error(err.message, "Url:", URL);
 		return null
